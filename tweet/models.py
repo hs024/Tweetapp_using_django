@@ -9,6 +9,7 @@ class Tweet(models.Model):
     photo =models.ImageField(upload_to="tweetphotos/",blank=True,null=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+    reaction_like=models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.user.username} - {self.text[:10]}'

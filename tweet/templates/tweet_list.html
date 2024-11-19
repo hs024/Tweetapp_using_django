@@ -13,13 +13,24 @@ tweet
 <div class='container row gap-4 m-auto'>
     {% for tweet in tweets %}
     <div class="card m-auto" style="width: 18rem;">
-  <img src="{{tweet.photo.url}}" class="card-img-top" alt="...">
+      {% if tweet.photo %}
+    
+      
+      <img src="{{tweet.photo.url}}" class="card-img-top" alt="...">
+      {% endif %}
   <div class="card-body">
     <h5 class="card-title">
     {{tweet.user.username}}
     </h5>
     <p class="card-text">
+      <form action="{% url 'tweet_like' tweet.id %}" method="post" id="like-form">
+        {% csrf_token %}
+        <p id="like-count">Like:{{tweet.reaction_like}}
+        <button type="submit" class="btn btn-primary" id="like-button">❤💕</button>
+        </p>
+      </form>
     {{tweet.text}}
+
 
     </p>
     {%if tweet.user == user %}
@@ -37,3 +48,35 @@ tweet
 
 </div>
 {% endblock %}
+
+
+
+
+
+
+<!-- Include jQuery and AJAX Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Handle form submission using AJAX
+    $('#like-form').submit(function(e) {
+        e.preventDefault();  // Prevent the form from submitting normally
+
+        var form = $(this);  // The form that was submitted
+        var postId = form.attr('action').split('/').pop();  // Extract the post ID from the form action URL
+
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'),  // The URL the form submits to (post like)
+            data: form.serialize(),    // Serialize form data (including CSRF token)
+            success: function(response) {
+                // Update the like count dynamically
+                $('#like-count').text(response.reaction_like);
+            },
+            error: function(xhr, errmsg, err) {
+                console.log("Error: " + errmsg);  // Log any errors for debugging
+            }
+        });
+    });
+});
+</script>

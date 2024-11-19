@@ -26,7 +26,7 @@ urlpatterns = [
 
     path("<int:tweet_id>/edit/",views.tweet_edit,name="tweet_edit"),
 
-
+    path("<int:tweet_id>/like",views.tweet_like,name="tweet_like"),
     path("register/",views.register,name="register"),
  
     # path("",views.index,name="index"),

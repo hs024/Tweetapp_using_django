@@ -3,6 +3,7 @@ from .models import Tweet
 from .forms import TweetForm,UserRegistrationform
 from django.shortcuts  import get_object_or_404,redirect
 from django.contrib.auth import login
+from django.db.models import Q
 
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -12,7 +13,29 @@ def index(request):
 
 def tweet_list(request):
     tweets=Tweet.objects.all().order_by('-created_at')
+    search_query = request.GET.get("search")
+    if search_query:
+        # Apply the search filter using Q objects
+        tweets = tweets.filter(
+            Q(user__username__icontains=search_query) | 
+            Q(text__icontains=search_query)
+        )
+    
+
     return render(request,'tweet_list.html',{'tweets':tweets})
+
+def tweet_like(request,tweet_id):
+    tweet=get_object_or_404(Tweet,id=tweet_id)
+    tweet.reaction_like+=1
+    tweet.save()
+    return redirect('tweet_list')
+    return JsonResponse({'reaction_like': tweet.reaction_like})
+
+
+
+
+
+
 
 @login_required
 def tweet_create(request):
